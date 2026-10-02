@@ -171,6 +171,53 @@ def test_bare_spoken_or_numeric_quantity_is_accepted() -> None:
         assert result["cart"][0]["quantity"] == 1
 
 
+def test_pending_quantity_can_be_skipped_and_alternatives_listed(monkeypatch) -> None:
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    result = send("I need some bananas, strawberry.")
+    assert result["stage"] == "clarify_quantity"
+
+    result = send(
+        "Can you tell me what are the other available? I don't need banana.",
+        result["session_id"],
+    )
+
+    assert result["stage"] == "collect_items"
+    assert result["catalog_group"] == "fruits"
+    assert "skipped bananas" in result["reply"].casefold()
+    assert [product["product_id"] for product in result["available_products"]] == [
+        "apples-1kg",
+        "strawberries-250g",
+    ]
+    assert result["available_products"][0]["in_stock"] is True
+    assert result["available_products"][1]["in_stock"] is False
+    assert result.get("cart", []) == []
+
+
+def test_pending_quantity_can_switch_to_another_product(monkeypatch) -> None:
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    result = send("bananas")
+    assert result["stage"] == "clarify_quantity"
+
+    result = send("I don't want bananas, change it to apples", result["session_id"])
+    assert result["stage"] == "clarify_quantity"
+    assert "apples" in result["reply"].casefold()
+
+    result = send("one", result["session_id"])
+    assert result["stage"] == "offer_more"
+    assert [item["product_id"] for item in result["cart"]] == ["apples-1kg"]
+
+
+def test_pending_size_selection_can_skip_product(monkeypatch) -> None:
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    result = send("eggs")
+    assert result["stage"] == "clarify_product"
+
+    result = send("I don't want eggs", result["session_id"])
+    assert result["stage"] == "collect_items"
+    assert result.get("cart", []) == []
+    assert "skipped fresh eggs" in result["reply"].casefold()
+
+
 def test_payment_matches_label_type_last_four_and_voice_variants() -> None:
     personal_phrases = (
         "personal card",

@@ -337,9 +337,15 @@ class GroceryAgent:
         session.pending_categories = list(grouped.items())
         return self._consume_categories(session)
 
-    def _catalog_group_result(self, session: Session, text: str) -> dict | None:
+    def _catalog_group_result(
+        self,
+        session: Session,
+        text: str,
+        excluded_categories: set[str] | None = None,
+    ) -> dict | None:
         """List relevant catalog products instead of guessing one from a broad category."""
         lowered = text.casefold()
+        excluded_categories = excluded_categories or set()
         names_a_catalog_group = any(
             re.search(rf"(?<!\w){re.escape(trigger)}(?!\w)", lowered)
             for group in CATALOG_GROUPS.values()
@@ -390,6 +396,7 @@ class GroceryAgent:
                 product
                 for product in CATALOG["products"]
                 if product["category"] in group["categories"]
+                and product["category"] not in excluded_categories
             ]
             specific_terms = {
                 term.casefold()
@@ -652,6 +659,12 @@ class GroceryAgent:
         return deals
 
     def _clarify_product(self, session: Session, text: str) -> dict:
+        pending_category = session.pending_products[0]["category"] if session.pending_products else None
+        if pending_category is not None:
+            redirected = self._redirect_pending_product(session, text, pending_category)
+            if redirected is not None:
+                return redirected
+
         selected = None
         numbers = _numbers_in_text(text)
         for product in session.pending_products:
@@ -692,6 +705,9 @@ class GroceryAgent:
         if product is None or category is None:
             session.stage = "collect_items"
             return self._result(session, "Tell me which grocery item and amount you need.")
+        redirected = self._redirect_pending_product(session, text, category, product)
+        if redirected is not None:
+            return redirected
         quantity = self._quantity_from_text(category, product, text, allow_bare_number=True)
         if quantity is None or quantity < 1 or quantity > 20:
             return self._result(session, f"Please give a clear amount. {self._quantity_prompt(product)}")
@@ -699,6 +715,98 @@ class GroceryAgent:
         session.pending_quantity_product = None
         session.pending_quantity_category = None
         return self._consume_categories(session)
+
+    def _redirect_pending_product(
+        self,
+        session: Session,
+        text: str,
+        category: str,
+        product: dict | None = None,
+    ) -> dict | None:
+        """Allow a shopper to skip or replace an item while answering a clarification."""
+        current = product or next(
+            (candidate for candidate in session.pending_products if candidate["category"] == category),
+            None,
+        )
+        if current is None or not self._declines_pending_product(current, text):
+            return None
+
+        session.pending_products = []
+        session.pending_quantity_product = None
+        session.pending_quantity_category = None
+        session.pending_notice = f"Okay, skipped {current['name']}."
+
+        lowered = text.casefold()
+        asks_for_alternatives = bool(
+            re.search(r"\b(?:other|another|alternative|alternatives|options?)\b.*\b(?:available|have|option|options)\b", lowered)
+            or re.search(r"\bwhat else (?:is|do you have)?\s*available\b", lowered)
+        )
+        if asks_for_alternatives:
+            group_name = next(
+                (
+                    name
+                    for name, group in CATALOG_GROUPS.items()
+                    if category in group["categories"]
+                ),
+                None,
+            )
+            if group_name is not None:
+                session.pending_categories = []
+                session.pending_request_text = ""
+                session.stage = "collect_items"
+                alternatives = self._catalog_group_result(
+                    session,
+                    f"show me {group_name}",
+                    excluded_categories={category},
+                )
+                if alternatives is not None:
+                    return alternatives
+
+        replacements = product_matches(text)
+        replacements.pop(category, None)
+        if not replacements and re.search(r"\b(?:change|replace|switch|instead)\b", lowered):
+            model_result = grouped_model_matches(text)
+            if model_result is not None:
+                replacements = model_result[0]
+                replacements.pop(category, None)
+
+        if replacements:
+            replacement_categories = set(replacements)
+            remaining = [
+                entry
+                for entry in session.pending_categories
+                if entry[0] != category and entry[0] not in replacement_categories
+            ]
+            session.pending_request_text = text
+            session.pending_categories = [*replacements.items(), *remaining]
+
+        return self._consume_categories(session)
+
+    def _declines_pending_product(self, product: dict, text: str) -> bool:
+        lowered = re.sub(r"[^a-z0-9']+", " ", text.casefold()).strip()
+        decline_requested = bool(
+            re.search(r"\b(?:don't|dont|do not|no longer)\s+(?:need|want)\b", lowered)
+            or re.search(r"\b(?:skip|remove|delete|drop|cancel)\b", lowered)
+            or re.search(r"\b(?:change|replace|switch)\b.*\b(?:product|item|it|this|that|to|with)\b", lowered)
+            or lowered in {"no", "no thanks", "not this", "something else"}
+        )
+        if not decline_requested:
+            return False
+
+        terms = {
+            product["category"].casefold(),
+            product["name"].casefold(),
+            *(alias.casefold() for alias in product.get("aliases", [])),
+        }
+        mentions_product = any(
+            re.search(rf"(?<!\w){re.escape(term)}(?!\w)", lowered)
+            for term in terms
+        )
+        generic_reference = bool(
+            re.search(r"\b(?:it|this|that|product|item)\b", lowered)
+            or lowered in {"no", "no thanks", "something else"}
+        )
+        return mentions_product or generic_reference
 
     def _quantity_prompt(self, product: dict) -> str:
         category = product["category"]
