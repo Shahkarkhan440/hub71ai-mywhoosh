@@ -129,6 +129,22 @@ def _wants_cart_review(text: str) -> bool:
     )
 
 
+def _is_explicit_cancel_fallback(text: str) -> bool:
+    """Keep unmistakable cancellation safe if the intent model is unavailable."""
+    normalized = re.sub(r"[^a-z0-9']+", " ", text.casefold()).strip()
+    return normalized in {
+        "cancel",
+        "cancel it",
+        "stop",
+        "stop it",
+        "abort",
+        "never mind",
+        "nevermind",
+        "forget it",
+        "i changed my mind",
+    }
+
+
 @dataclass
 class Session:
     id: str
@@ -152,6 +168,7 @@ class Session:
     selected_payment_method: dict | None = None
     match_source: str | None = None
     collecting_more: bool = False
+    turn_intent: str = "unknown"
     history: list[dict] = field(default_factory=list)
     order: dict | None = None
 
@@ -183,6 +200,13 @@ class GroceryAgent:
     def respond(self, session: Session, message: str) -> dict:
         text = message.strip()
 
+        session.turn_intent = "unknown"
+        if session.stage not in {"completed", "cancelled"}:
+            session.turn_intent = classify_stage_intent(session.stage, text)
+            if session.turn_intent == "cancel" or _is_explicit_cancel_fallback(text):
+                session.stage = "cancelled"
+                return self._result(session, "Order cancelled. No charge was made.")
+
         if _is_greeting(text):
             return self._greeting_reply(session)
 
@@ -203,7 +227,7 @@ class GroceryAgent:
             if re.search(r"\b(?:add|include|need|want)\b", text.casefold()):
                 session.collecting_more = True
                 return self._collect(session, text)
-            intent = "affirm" if _is_yes(text) else classify_stage_intent(session.stage, text)
+            intent = "affirm" if _is_yes(text) else session.turn_intent
             if intent == "affirm":
                 session.stage = "confirm_address"
                 return self._ask_address(session)
@@ -973,7 +997,7 @@ class GroceryAgent:
         if _is_yes(text):
             default_id = PROFILE["preferences"]["default_address_id"]
             selected = next(address for address in PROFILE["addresses"] if address["id"] == default_id)
-        intent = classify_stage_intent(session.stage, text) if selected is None else "unknown"
+        intent = session.turn_intent if selected is None else "unknown"
         if selected is None and intent == "home":
             selected = next((address for address in PROFILE["addresses"] if address["id"] == "home"), None)
         if selected:
@@ -1003,7 +1027,7 @@ class GroceryAgent:
         return self._result(session, "Any delivery note? You can say none.", True)
 
     def _confirm_instructions(self, session: Session, text: str) -> dict:
-        intent = "keep_note" if _is_yes(text) else classify_stage_intent(session.stage, text)
+        intent = "keep_note" if _is_yes(text) else session.turn_intent
         if intent == "keep_note":
             selected = next(
                 (address for address in PROFILE["addresses"] if address["id"] == session.selected_address_id),
@@ -1027,7 +1051,7 @@ class GroceryAgent:
         return self._result(session, f"Use delivery number {PROFILE['phone']}?", True)
 
     def _confirm_phone(self, session: Session, text: str) -> dict:
-        intent = "keep_phone" if _is_yes(text) else classify_stage_intent(session.stage, text)
+        intent = "keep_phone" if _is_yes(text) else session.turn_intent
         if intent == "keep_phone":
             session.phone = PROFILE["phone"]
             session.stage = "confirm_delivery_time"
@@ -1073,7 +1097,7 @@ class GroceryAgent:
             default_id = PROFILE["preferences"]["default_payment_method_id"]
             selected = next(card for card in PROFILE["payment_methods"] if card["id"] == default_id)
         if selected is None:
-            intent = classify_stage_intent(session.stage, text)
+            intent = session.turn_intent
             if intent == "personal_card" or "default" in lowered or "first" in lowered:
                 selected = next(card for card in PROFILE["payment_methods"] if card["id"] == "visa-4242")
             elif intent == "work_card" or "second" in lowered:
@@ -1139,7 +1163,7 @@ class GroceryAgent:
         return candidates[0] if len(candidates) == 1 else None
 
     def _final_confirmation(self, session: Session, text: str) -> dict:
-        intent = classify_stage_intent(session.stage, text) if not _is_yes(text) and not _is_no(text) else "unknown"
+        intent = session.turn_intent if not _is_yes(text) and not _is_no(text) else "unknown"
         if _is_no(text) or intent == "cancel":
             session.stage = "cancelled"
             return self._result(session, "Order cancelled. No charge was made.")

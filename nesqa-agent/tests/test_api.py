@@ -342,6 +342,54 @@ def test_no_order_without_explicit_final_confirmation() -> None:
     assert "order" not in result
 
 
+@pytest.mark.parametrize(
+    "stage",
+    (
+        "collect_items",
+        "clarify_product",
+        "clarify_quantity",
+        "edit_cart_quantity",
+        "offer_more",
+        "review_cart",
+        "confirm_address",
+        "new_address",
+        "confirm_instructions",
+        "new_instructions",
+        "confirm_phone",
+        "new_phone",
+        "confirm_delivery_time",
+        "confirm_payment",
+        "final_confirmation",
+    ),
+)
+@pytest.mark.parametrize(
+    "phrase",
+    ("cancel", "cancel my order", "stop the order", "don't place the order", "I changed my mind"),
+)
+def test_order_can_be_cancelled_before_placement_at_any_stage(
+    stage: str,
+    phrase: str,
+    monkeypatch,
+) -> None:
+    monkeypatch.setattr("app.agent.classify_stage_intent", lambda _stage, _text: "cancel")
+    session = agent.new_session()
+    session.stage = stage
+
+    result = send(phrase, session.id)
+
+    assert result["stage"] == "cancelled"
+    assert result.get("order") is None
+    assert "no charge was made" in result["reply"].casefold()
+
+
+def test_product_removal_is_not_mistaken_for_order_cancellation() -> None:
+    result = send("one kg bananas and one litre milk")
+    result = send("remove bananas", result["session_id"])
+
+    assert result["stage"] == "offer_more"
+    assert [item["product_id"] for item in result["cart"]] == ["milk-1l"]
+
+
 def test_expired_session_is_not_silently_replaced() -> None:
     response = client.post(
         "/api/chat",
