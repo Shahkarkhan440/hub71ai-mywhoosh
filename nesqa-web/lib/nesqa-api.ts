@@ -1,6 +1,7 @@
 export const NESQA_SESSION_KEY = "nesqa_session_id";
 
 const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ??
   process.env.NEXT_PUBLIC_NESQA_API_URL?.replace(/\/$/, "") ??
   "http://127.0.0.1:8000";
 

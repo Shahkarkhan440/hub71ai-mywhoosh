@@ -124,7 +124,10 @@ export class NesqaVoiceClient {
     if (this.isSocketOpen() && this.readyPromise) return this.readyPromise;
     if (this.socket?.readyState === WebSocket.CONNECTING && this.readyPromise) return this.readyPromise;
 
-    const baseUrl = process.env.NEXT_PUBLIC_NESQA_WS_URL?.replace(/\/$/, "") ?? DEFAULT_VOICE_URL;
+    const baseUrl =
+      process.env.NEXT_PUBLIC_WS_URL?.replace(/\/$/, "") ??
+      process.env.NEXT_PUBLIC_NESQA_WS_URL?.replace(/\/$/, "") ??
+      DEFAULT_VOICE_URL;
     const url = new URL(baseUrl);
     if (sessionId) url.searchParams.set("session_id", sessionId);
     else url.searchParams.set("mode", "express");
@@ -140,7 +143,7 @@ export class NesqaVoiceClient {
     socket.addEventListener("message", (message) => this.handleMessage(message));
     socket.addEventListener("error", () => {
       if (this.socket !== socket || this.closeRequested) return;
-      const error = new Error("Could not connect to the NESQA voice service at localhost:8000.");
+      const error = new Error("Could not connect to the NESQA voice service.");
       this.rejectReady?.(error);
       this.callbacks.onStatus("error");
       this.callbacks.onError(error.message, "voice_connection_failed");
