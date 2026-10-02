@@ -88,7 +88,7 @@ async def _configure_openai(realtime: Any) -> None:
                                 "type": "server_vad",
                                 "threshold": 0.5,
                                 "prefix_padding_ms": 300,
-                                "silence_duration_ms": 650,
+                                "silence_duration_ms": 400,
                                 "create_response": False,
                                 "interrupt_response": False,
                             },
