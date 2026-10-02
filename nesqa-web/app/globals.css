@@ -1,0 +1,51 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "../vendor/shadcn-tailwind-4.13.0.css";
+
+@utility scrollbar-thin { scrollbar-width: thin; scrollbar-color: #c8d2da transparent; }
+@utility scrollbar-none { scrollbar-width: none; &::-webkit-scrollbar { display: none; } }
+
+:root {
+  --background: #f3f7f9; --foreground: #10253f; --card: #ffffff; --card-foreground: #10253f;
+  --popover: #ffffff; --popover-foreground: #10253f; --primary: #10253f; --primary-foreground: #ffffff;
+  --secondary: #eef3f6; --secondary-foreground: #23384f; --muted: #eef3f6; --muted-foreground: #718093;
+  --accent: #fff7b8; --accent-foreground: #10253f; --destructive: #d94b4b; --border: #dfe6eb;
+  --input: #d8e0e6; --ring: #9faebb; --chart-1: #10253f; --chart-2: #ffe557; --chart-3: #28a77b;
+  --chart-4: #4a8dc4; --chart-5: #f19a4c; --radius: 0.875rem; --sidebar: #ffffff; --sidebar-foreground: #10253f;
+  --sidebar-primary: #10253f; --sidebar-primary-foreground: #ffffff; --sidebar-accent: #fff7b8;
+  --sidebar-accent-foreground: #10253f; --sidebar-border: #dfe6eb; --sidebar-ring: #9faebb;
+}
+
+@theme inline {
+  --color-background: var(--background); --color-foreground: var(--foreground); --color-card: var(--card); --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover); --color-popover-foreground: var(--popover-foreground); --color-primary: var(--primary); --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary); --color-secondary-foreground: var(--secondary-foreground); --color-muted: var(--muted); --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent); --color-accent-foreground: var(--accent-foreground); --color-destructive: var(--destructive); --color-border: var(--border);
+  --color-input: var(--input); --color-ring: var(--ring); --color-chart-1: var(--chart-1); --color-chart-2: var(--chart-2); --color-chart-3: var(--chart-3); --color-chart-4: var(--chart-4); --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar); --color-sidebar-foreground: var(--sidebar-foreground); --color-sidebar-primary: var(--sidebar-primary); --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent); --color-sidebar-accent-foreground: var(--sidebar-accent-foreground); --color-sidebar-border: var(--sidebar-border); --color-sidebar-ring: var(--sidebar-ring);
+  --radius-sm: calc(var(--radius) - 4px); --radius-md: calc(var(--radius) - 2px); --radius-lg: var(--radius); --radius-xl: calc(var(--radius) + 6px);
+  --font-sans: "Avenir Next", Avenir, "Segoe UI", system-ui, sans-serif; --font-display: "Avenir Next", Avenir, "Segoe UI", system-ui, sans-serif;
+}
+
+* { border-color: var(--border); }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--background); color: var(--foreground); font-family: "Avenir Next", Avenir, "Segoe UI", system-ui, sans-serif; }
+button, a { -webkit-tap-highlight-color: transparent; }
+
+@keyframes nesqa-confetti-fall {
+  0% { opacity: 0; transform: translate3d(0, -12vh, 0) rotate(0deg); }
+  8% { opacity: 1; }
+  100% { opacity: 0; transform: translate3d(24px, 110vh, 0) rotate(720deg); }
+}
+
+.nesqa-confetti {
+  position: absolute;
+  top: -10%;
+  animation-name: nesqa-confetti-fall;
+  animation-timing-function: cubic-bezier(.18, .75, .3, 1);
+  animation-fill-mode: both;
+}
+
+@media (max-width: 1023px) { body { overflow-y: auto; } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; } }

@@ -1,0 +1,44 @@
+{
+  "currency": "AED",
+  "vendors": [
+    {
+      "id": "carrefour",
+      "name": "Carrefour UAE",
+      "delivery_fee": 7.0,
+      "eta_minutes": 45,
+      "minimum_order": 25.0
+    },
+    {
+      "id": "lulu",
+      "name": "LuLu Hypermarket",
+      "delivery_fee": 5.0,
+      "eta_minutes": 60,
+      "minimum_order": 20.0
+    },
+    {
+      "id": "noon_minutes",
+      "name": "noon Minutes",
+      "delivery_fee": 8.0,
+      "eta_minutes": 20,
+      "minimum_order": 15.0
+    }
+  ],
+  "products": [
+    {"id":"eggs-6","name":"Fresh Eggs","category":"eggs","size":"6 pack","aliases":["egg","eggs"],"offers":[{"vendor":"carrefour","brand":"Al Jazira","price":6.75},{"vendor":"lulu","brand":"Saha","price":6.25,"promotion":"10% off"},{"vendor":"noon_minutes","brand":"Khaleej","price":7.25}]},
+    {"id":"eggs-15","name":"Fresh Eggs","category":"eggs","size":"15 pack","aliases":["egg","eggs"],"offers":[{"vendor":"carrefour","brand":"Al Jazira","price":13.95,"promotion":"Best seller"},{"vendor":"lulu","brand":"Saha","price":12.75},{"vendor":"noon_minutes","brand":"Khaleej","price":14.5}]},
+    {"id":"milk-1l","name":"Full Fat Milk","category":"milk","size":"1 L","aliases":["milk"],"offers":[{"vendor":"carrefour","brand":"Al Ain Farms","price":6.5},{"vendor":"lulu","brand":"Al Rawabi","price":6.25},{"vendor":"noon_minutes","brand":"Marmum","price":6.75}]},
+    {"id":"bread-white","name":"Sliced White Bread","category":"bread","size":"600 g","aliases":["bread","white bread"],"offers":[{"vendor":"carrefour","brand":"Modern Bakery","price":5.25},{"vendor":"lulu","brand":"Lusine","price":5.0},{"vendor":"noon_minutes","brand":"Modern Bakery","price":5.5}]},
+    {"id":"rice-5kg","name":"Basmati Rice","category":"rice","size":"5 kg","aliases":["rice","basmati"],"offers":[{"vendor":"carrefour","brand":"India Gate","price":39.95,"promotion":"Save AED 5"},{"vendor":"lulu","brand":"Daawat","price":37.5},{"vendor":"noon_minutes","brand":"Tilda","price":44.0}]},
+    {"id":"bananas-1kg","name":"Bananas","category":"bananas","size":"1 kg","aliases":["banana","bananas"],"offers":[{"vendor":"carrefour","brand":"Fresh","price":6.95},{"vendor":"lulu","brand":"Fresh","price":6.5},{"vendor":"noon_minutes","brand":"Fresh","price":7.25}]},
+    {"id":"chicken-1kg","name":"Fresh Chicken Breast","category":"chicken","size":"1 kg","aliases":["chicken","chicken breast"],"offers":[{"vendor":"carrefour","brand":"Al Rawdah","price":31.5},{"vendor":"lulu","brand":"Alyoum","price":29.95,"promotion":"Weekend offer"},{"vendor":"noon_minutes","brand":"Al Rawdah","price":33.0}]},
+    {"id":"water-6x1.5l","name":"Drinking Water","category":"water","size":"6 x 1.5 L","aliases":["water","bottled water"],"offers":[{"vendor":"carrefour","brand":"Al Ain","price":11.95},{"vendor":"lulu","brand":"Oasis","price":10.5},{"vendor":"noon_minutes","brand":"Mai Dubai","price":12.0}]},
+    {"id":"yogurt-1kg","name":"Plain Yogurt","category":"yogurt","size":"1 kg","aliases":["yogurt","yoghurt"],"offers":[{"vendor":"carrefour","brand":"Almarai","price":8.5},{"vendor":"lulu","brand":"Al Ain Farms","price":7.95},{"vendor":"noon_minutes","brand":"Almarai","price":8.75}]},
+    {"id":"tomatoes-1kg","name":"Tomatoes","category":"tomatoes","size":"1 kg","aliases":["tomato","tomatoes"],"offers":[{"vendor":"carrefour","brand":"Fresh","price":7.5},{"vendor":"lulu","brand":"Fresh","price":6.95},{"vendor":"noon_minutes","brand":"Fresh","price":8.0}]},
+    {"id":"onions-1kg","name":"Red Onions","category":"onions","size":"1 kg","aliases":["onion","onions"],"offers":[{"vendor":"carrefour","brand":"Fresh","price":5.25},{"vendor":"lulu","brand":"Fresh","price":4.75},{"vendor":"noon_minutes","brand":"Fresh","price":5.5}]},
+    {"id":"apples-1kg","name":"Royal Gala Apples","category":"apples","size":"1 kg","aliases":["apple","apples"],"offers":[{"vendor":"carrefour","brand":"Fresh","price":10.95},{"vendor":"lulu","brand":"Fresh","price":10.5},{"vendor":"noon_minutes","brand":"Fresh","price":11.75}]},
+    {"id":"oil-1.5l","name":"Sunflower Oil","category":"oil","size":"1.5 L","aliases":["oil","cooking oil","sunflower oil"],"offers":[{"vendor":"carrefour","brand":"Noor","price":18.95},{"vendor":"lulu","brand":"Afia","price":17.5,"promotion":"Special price"},{"vendor":"noon_minutes","brand":"Noor","price":19.5}]},
+    {"id":"tea-100","name":"Black Tea Bags","category":"tea","size":"100 bags","aliases":["tea","tea bags"],"offers":[{"vendor":"carrefour","brand":"Lipton","price":19.95},{"vendor":"lulu","brand":"Tetley","price":18.75},{"vendor":"noon_minutes","brand":"Lipton","price":20.5}]},
+    {"id":"detergent-2.5kg","name":"Laundry Detergent","category":"detergent","size":"2.5 kg","aliases":["detergent","washing powder","laundry detergent"],"offers":[{"vendor":"carrefour","brand":"Ariel","price":34.95,"promotion":"Buy 1 save 15%"},{"vendor":"lulu","brand":"Tide","price":32.5},{"vendor":"noon_minutes","brand":"Ariel","price":36.0}]},
+    {"id":"strawberries-250g","name":"Fresh Strawberries","category":"strawberries","size":"250 g","available_quantity":0,"aliases":["strawberry","strawberries","strawbery","strawberies","straberry"],"offers":[{"vendor":"carrefour","brand":"Fresh","price":12.95},{"vendor":"lulu","brand":"Fresh","price":11.95},{"vendor":"noon_minutes","brand":"Fresh","price":13.5}]}
+  ]
+}

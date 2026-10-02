@@ -1,0 +1,25 @@
+{
+  "id": "demo-user",
+  "name": "Omar",
+  "phone": "+971 50 123 4567",
+  "addresses": [
+    {
+      "id": "home",
+      "label": "Home",
+      "address": "Apartment 1204, Gate Tower 2, Al Reem Island, Abu Dhabi",
+      "delivery_instructions": "Call from the lobby; do not ring the bell."
+    }
+  ],
+  "payment_methods": [
+    {"id": "visa-4242", "type": "Visa", "last4": "4242", "label": "Personal card"},
+    {"id": "mastercard-4444", "type": "Mastercard", "last4": "4444", "label": "Work card"}
+  ],
+  "preferences": {
+    "default_address_id": "home",
+    "default_payment_method_id": "visa-4242",
+    "default_product_ids": {
+      "eggs": "eggs-15"
+    },
+    "substitutions_allowed": true
+  }
+}
