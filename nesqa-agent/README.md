@@ -35,6 +35,15 @@ The named volume keeps `orders.json` across container replacements. Set `PORT`
 if your server platform requires a different container port. Never copy `.env`
 or `OPENAI_API_KEY` into the image; provide secrets when starting the container.
 
+For Docker Compose deployments such as Dokploy, use:
+
+```bash
+docker compose --env-file .env up -d --build
+```
+
+From the monorepo root, the Compose path is `nesqa-agent/docker-compose.yml`.
+Set `APP_PORT` only when the host port must be different from `8000`.
+
 ## Try a conversation
 
 Start an order (the `mode` field is no longer required):
