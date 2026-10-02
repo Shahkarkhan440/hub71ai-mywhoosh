@@ -3,6 +3,13 @@
 Nesqa is an Abu Dhabi grocery-shopping voice agent built for the Hub71 AI
 hackathon.
 
+## Hackathon submission
+
+- **Team name:** Mywhoosh
+- **GitHub repository:** [hub71ai-mywhoosh](https://github.com/Shahkarkhan440/hub71ai-mywhoosh)
+- **Submission build commit SHA:** `9a307cd5416d03d4bfe2c01a874ac2003e331e30`
+- **Live demo:** [nesqa-grocery.hub71-hackat-7654.chatgpt.site](https://nesqa-grocery.hub71-hackat-7654.chatgpt.site/)
+
 ## Projects
 
 - `nesqa-agent/` — FastAPI backend, grocery agent, Realtime voice WebSocket,
